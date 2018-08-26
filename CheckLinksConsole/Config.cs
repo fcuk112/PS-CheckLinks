@@ -10,7 +10,7 @@ namespace CheckLinksConsole
         {
             var inMemory = new Dictionary<string, string>
             {
-                { "site", "http://microsoft.com" },
+                { "site", "http://g0t4.github.io/pluralsight-dotnet-core-xplat-apps" },
                 { "output:folder", "reports" }
             };
             var configBuilder = new ConfigurationBuilder()
@@ -21,11 +21,13 @@ namespace CheckLinksConsole
                 .AddEnvironmentVariables();
 
             var configuration = configBuilder.Build();
+            ConfigurationRoot = configuration;
             Site = configuration["site"];
             Output = configuration.GetSection("output").Get<OutputSettings>();
         }
 
         public string Site { get; set; }
         public OutputSettings Output { get; set; }
+        public IConfigurationRoot ConfigurationRoot { get; set; }
     }
 }

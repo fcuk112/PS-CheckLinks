@@ -13,9 +13,12 @@ namespace CheckLinksConsole
 
         static void Main(string[] args)
         {
+            var config = new Config(args);
+
+            Logs.Init(config.ConfigurationRoot);
+
             var logger = Logs.Factory.CreateLogger<Program>();
 
-            var config = new Config(args);
             Directory.CreateDirectory(config.Output.GetReportDirectory());
 
             logger.LogInformation(200, $"Saving report to {config.Output.GetReportFilePath()}");
@@ -24,7 +27,6 @@ namespace CheckLinksConsole
             var body = client.GetStringAsync(config.Site);
 
             var links = LinkChecker.GetLinks(config.Site, body.Result);
-            return;
 
             var checkedLinks = LinkChecker.CheckLinks(links);
             using (var file = File.CreateText(config.Output.GetReportFilePath()))

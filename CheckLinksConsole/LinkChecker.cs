@@ -10,6 +10,7 @@ namespace CheckLinksConsole
 {
     public class LinkChecker
     {
+        protected static readonly ILogger<LinkChecker> Logger = Logs.Factory.CreateLogger<LinkChecker>();
         public static IEnumerable<string> GetLinks(string link, string page)
         {
             var htmlDocument = new HtmlDocument();
@@ -17,11 +18,12 @@ namespace CheckLinksConsole
             var originalLinks = htmlDocument.DocumentNode.SelectNodes("//a[@href]")
                 .Select(n => n.GetAttributeValue("href", string.Empty))
                 .ToList();
-            var logger = Logs.Factory.CreateLogger<LinkChecker>();
 
-            using (logger.BeginScope($"Getting links from {link}"))
+            // var logger = Logs.Factory.CreateLogger<LinkChecker>();
+
+            using (Logger.BeginScope($"Getting links from {link}"))
             {
-                originalLinks.ForEach(l => logger.LogTrace(100, "Original link: {link}", l));
+                originalLinks.ForEach(l => Logger.LogTrace(100, "Original link: {link}", l));
             }
 
             var links = originalLinks
@@ -54,6 +56,7 @@ namespace CheckLinksConsole
                 }
                 catch (HttpRequestException exception)
                 {
+                    Logger.LogTrace(0, exception, "Failed to retrieve {link}", link);
                     result.Problem = exception.Message;
                     return result;
                 }
