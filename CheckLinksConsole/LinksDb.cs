@@ -10,7 +10,6 @@ namespace CheckLinksConsole
         {
             var connection = @"Server=localhost;Database=Links;User Id=sa;Password=Whatever12!";
             optionsBuilder.UseSqlServer(connection);
-
         }
     }
 }
