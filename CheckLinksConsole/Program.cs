@@ -17,6 +17,9 @@ namespace CheckLinksConsole
 
             var config = new Config(args);
             Directory.CreateDirectory(config.Output.GetReportDirectory());
+
+            logger.LogInformation(200, $"Saving report to {config.Output.GetReportFilePath()}");
+
             var client = new HttpClient();
             var body = client.GetStringAsync(config.Site);
 
