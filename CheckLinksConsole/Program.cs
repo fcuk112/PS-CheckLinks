@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace CheckLinksConsole
 {
@@ -12,13 +13,16 @@ namespace CheckLinksConsole
 
         static void Main(string[] args)
         {
+            var factory = new LoggerFactory();
+            var logger = factory.CreateLogger("main");
+            factory.AddConsole(minLevel: LogLevel.Debug);
+            factory.AddFile("logs/checklinks-{Date}.txt", minimumLevel: LogLevel.Debug);
+
             var config = new Config(args);
             Directory.CreateDirectory(config.Output.GetReportDirectory());
             var client = new HttpClient();
             var body = client.GetStringAsync(config.Site);
-            Console.WriteLine(body.Result);
-
-            Console.WriteLine();
+            logger.LogDebug(body.Result);
 
             Console.WriteLine("Links");
             var links = LinkChecker.GetLinks(body.Result);
