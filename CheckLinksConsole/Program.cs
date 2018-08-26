@@ -13,17 +13,15 @@ namespace CheckLinksConsole
 
         static void Main(string[] args)
         {
-            var logger = Logs.Factory.CreateLogger("main");
+            var logger = Logs.Factory.CreateLogger<Program>();
 
             var config = new Config(args);
             Directory.CreateDirectory(config.Output.GetReportDirectory());
             var client = new HttpClient();
             var body = client.GetStringAsync(config.Site);
-            logger.LogDebug(body.Result);
 
-            Console.WriteLine("Links");
-            var links = LinkChecker.GetLinks(body.Result);
-            links.ToList().ForEach(Console.WriteLine);
+            var links = LinkChecker.GetLinks(config.Site, body.Result);
+            return;
 
             var checkedLinks = LinkChecker.CheckLinks(links);
             using (var file = File.CreateText(config.Output.GetReportFilePath()))

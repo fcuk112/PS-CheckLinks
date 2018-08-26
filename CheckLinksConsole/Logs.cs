@@ -7,8 +7,8 @@ namespace CheckLinksConsole
         public static LoggerFactory Factory = new LoggerFactory();
         static Logs()
         {
-            Factory.AddConsole(minLevel: LogLevel.Debug);
-            Factory.AddFile("logs/checklinks-{Date}.txt", minimumLevel: LogLevel.Debug);
+            Factory.AddConsole(minLevel: LogLevel.Trace, includeScopes: true);
+            Factory.AddFile("logs/checklinks-{Date}.txt", minimumLevel: LogLevel.Trace);
 
         }
     }

@@ -10,7 +10,7 @@ namespace CheckLinksConsole
         {
             var inMemory = new Dictionary<string, string>
             {
-                { "site", "http://google.com" },
+                { "site", "http://microsoft.com" },
                 { "output:folder", "reports" }
             };
             var configBuilder = new ConfigurationBuilder()

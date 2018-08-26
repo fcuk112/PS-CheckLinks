@@ -4,17 +4,27 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 
 namespace CheckLinksConsole
 {
     public class LinkChecker
     {
-        public static IEnumerable<string> GetLinks(string page)
+        public static IEnumerable<string> GetLinks(string link, string page)
         {
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(page);
-            var links = htmlDocument.DocumentNode.SelectNodes("//a[@href]")
+            var originalLinks = htmlDocument.DocumentNode.SelectNodes("//a[@href]")
                 .Select(n => n.GetAttributeValue("href", string.Empty))
+                .ToList();
+            var logger = Logs.Factory.CreateLogger<LinkChecker>();
+
+            using (logger.BeginScope($"Getting links from {link}"))
+            {
+                originalLinks.ForEach(l => logger.LogTrace(l));
+            }
+
+            var links = originalLinks
                 .Where(l => !String.IsNullOrEmpty(l))
                 .Where(l => l.StartsWith("http"));
 
