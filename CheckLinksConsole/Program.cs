@@ -13,10 +13,7 @@ namespace CheckLinksConsole
 
         static void Main(string[] args)
         {
-            var factory = new LoggerFactory();
-            var logger = factory.CreateLogger("main");
-            factory.AddConsole(minLevel: LogLevel.Debug);
-            factory.AddFile("logs/checklinks-{Date}.txt", minimumLevel: LogLevel.Debug);
+            var logger = Logs.Factory.CreateLogger("main");
 
             var config = new Config(args);
             Directory.CreateDirectory(config.Output.GetReportDirectory());
