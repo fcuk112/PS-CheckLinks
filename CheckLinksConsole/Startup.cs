@@ -1,26 +1,37 @@
+using System;
+using System.Linq;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CheckLinksConsole
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private IConfigurationRoot _Config;
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            _Config = Config.Build();
+
             services.AddHangfire(c => c.UseMemoryStorage());
             JobStorage.Current = new MemoryStorage();
+
+            services.AddTransient<CheckLinkJob>();
+            services.AddTransient<LinkChecker>();
+            services.Configure<OutputSettings>(_Config.GetSection("output"));
+            services.Configure<SiteSettings>(_Config);
+
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
+            Logs.Init(loggerFactory, _Config);
+
             app.UseHangfireServer();
             app.UseHangfireDashboard();
         }

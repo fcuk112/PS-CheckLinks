@@ -5,12 +5,10 @@ namespace CheckLinksConsole
 {
     public static class Logs
     {
-        public static LoggerFactory Factory = new LoggerFactory();
-        public static void Init(IConfiguration configuration)
+        public static void Init(ILoggerFactory factory, IConfiguration configuration)
         {
-            // Factory.AddConsole(minLevel: LogLevel.Trace, includeScopes: true);
-            Factory.AddConsole(configuration.GetSection("Logging"));
-            Factory.AddFile("logs/checklinks-{Date}.json",
+            factory.AddConsole(configuration.GetSection("Logging"));
+            factory.AddFile("logs/checklinks-{Date}.json",
                 isJson: true,
                 minimumLevel: LogLevel.Trace);
         }

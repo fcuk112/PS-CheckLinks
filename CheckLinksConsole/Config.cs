@@ -1,12 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 
 namespace CheckLinksConsole
 {
     public class Config
     {
-        public Config(string[] args)
+        public static IConfigurationRoot Build()
         {
             var inMemory = new Dictionary<string, string>
             {
@@ -17,17 +19,11 @@ namespace CheckLinksConsole
                 .AddInMemoryCollection(inMemory)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("checksettings.json", optional: true, reloadOnChange: true)
-                .AddCommandLine(args)
+                .AddCommandLine(Environment.GetCommandLineArgs().Skip(1).ToArray())
                 .AddEnvironmentVariables();
 
-            var configuration = configBuilder.Build();
-            ConfigurationRoot = configuration;
-            Site = configuration["site"];
-            Output = configuration.GetSection("output").Get<OutputSettings>();
+            return configBuilder.Build();
         }
 
-        public string Site { get; set; }
-        public OutputSettings Output { get; set; }
-        public IConfigurationRoot ConfigurationRoot { get; set; }
     }
 }

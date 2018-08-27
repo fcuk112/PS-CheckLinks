@@ -1,27 +1,43 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CheckLinksConsole
 {
     public class CheckLinkJob
     {
-        public void Execute(string site, OutputSettings output)
+        private ILogger _Logger;
+        private OutputSettings _Output;
+        private SiteSettings _Site;
+        private LinkChecker _LinkChecker;
+        public CheckLinkJob(ILogger<CheckLinkJob> logger,
+        IOptions<OutputSettings> outputOptions,
+        IOptions<SiteSettings> siteOptions,
+        LinkChecker linkChecker)
         {
-            var logger = Logs.Factory.CreateLogger<CheckLinkJob>();
+            _Logger = logger;
+            _Logger.LogInformation($"{Guid.NewGuid()}");
+            _Output = outputOptions.Value;
+            _Site = siteOptions.Value;
+            _LinkChecker = linkChecker;
+        }
 
-            Directory.CreateDirectory(output.GetReportDirectory());
+        public void Execute()
+        {
+            Directory.CreateDirectory(_Output.GetReportDirectory());
 
-            logger.LogInformation(200, $"Saving report to {output.GetReportFilePath()}");
+            _Logger.LogInformation(200, $"Saving report to {_Output.GetReportFilePath()}");
 
             var client = new HttpClient();
-            var body = client.GetStringAsync(site);
+            var body = client.GetStringAsync(_Site.Site);
 
-            var links = LinkChecker.GetLinks(site, body.Result);
+            var links = _LinkChecker.GetLinks(_Site.Site, body.Result);
 
-            var checkedLinks = LinkChecker.CheckLinks(links);
-            using (var file = File.CreateText(output.GetReportFilePath()))
+            var checkedLinks = _LinkChecker.CheckLinks(links);
+            using (var file = File.CreateText(_Output.GetReportFilePath()))
             using (var linksDb = new LinksDb())
             {
                 foreach (var link in checkedLinks.OrderBy(l => l.Exists))

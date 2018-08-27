@@ -5,6 +5,8 @@ using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CheckLinksConsole
 {
@@ -13,14 +15,19 @@ namespace CheckLinksConsole
 
         static void Main(string[] args)
         {
-            var config = new Config(args);
-            Logs.Init(config.ConfigurationRoot);
-
             var host = CreateWebHostBuilder(args).Build();
 
-            // RecurringJob.AddOrUpdate<CheckLinkJob>("check-link", j => j.Execute(config.Site, config.Output), Cron.Minutely);
-            // RecurringJob.Trigger("check-link");
-            RecurringJob.AddOrUpdate(() => Console.Write("Simple!"), Cron.Minutely);
+            RecurringJob.Trigger("check-link");
+
+            // RecurringJob.AddOrUpdate(() => Console.Write("Simple!"), Cron.Minutely);
+
+
+            // var loggerFactory = host.Services.GetService<ILoggerFactory>();
+            // loggerFactory.CreateLogger<Program>().LogInformation("Frank Testing!");
+
+            RecurringJob.AddOrUpdate<CheckLinkJob>("check-link",
+                j => j.Execute(),
+                Cron.Minutely);
 
             host.Run();
 
